@@ -1,0 +1,19 @@
+const path = require("path");
+
+//get platform specific path separator
+console.log(path.sep);
+
+//JOIN file path's with platform specific separator
+
+const filePath = path.join(
+  "/content",
+  "folderName",
+  "subfolderName",
+  "file.js"
+);
+console.log(filePath);
+console.log(path.basename(filePath));
+
+//change to absolute path
+const absolutePath = path.resolve(__dirname, filePath);
+console.log(absolutePath);

@@ -1,0 +1,821 @@
+Every browser has an enjin that compile javascript code down to machine code.
+Form chrome it was called v8engine
+The creator of Node.js Ryan stirpped out the v8 engine and build node on top of it.
+
+Browseer vs Node.js
+
+Browser                                         Node.js
+Dom    						No DOM (no goe location, no fetch..)
+Window						No Window
+Interactive Apps				Server side apps
+No Filesystem					Filesystem (info about our os, network rquest to name fews)
+Fragrmentation	(if user's browser is 
+                 not working it is our r/b
+                 to fix it)			Versions
+ES6 Modules					CommonJS( similar to es6 modules but sintax is a bit d/t
+
+intall lts of node lts-long term support (otherwise the current version)
+
+How do node evaluate our js? 2 option 
+1. REPL stands for read eval pring loop - usually it is for playing arround.
+2. CLI excutable running our code in node
+
+1. using REPL
+
+in command write node and click enter w/o any arguement
+
+the angle symbole means you r already in REPL you can define const, functions, and call anytime for the 
+REPL to evaluate it.
+When it comes to serios app, the CLI executable is used.
+
+2. using CLI Excutable
+just create a .js file, write code and from the terminal run-  node [path of the file]
+ e.g. node app.js
+
+eng - I don't want to rain on your parade
+
+Global variables
+
+There is no WINDOW
+
+// __dirname - path to current directory
+// __filename - file name
+// require - function to use modules(CommonJS)
+// module - info about current modele(file)
+// process - info about env where the program is being executed
+
+
+setInterval - to execute a callback every given time given again and again
+setTimeout - execute a code after the given time, only once
+
+Do you execute only one file?, Yes but you can splite your code in modules.
+EN....extremly complex is air quotes for now
+
+==================================================================================================
+EVENT LOOP
+Event loop is what allow Node.js to perform a non-blocking I/O operation, despite the fact that javascript is a single threaded 
+About event loop - https://course-api.com/slides/
+
+
+In browsers and in node.js tasks in callback fn are done at last. But javascript is always sync
+
+the process with callback fn is as follows
+if callback register callback -> execute next tasks and wait untill u get result -> get result -> execute the tasks in callback
+
+E.g.
+const { readFile, writeFile } = require("fs");
+
+console.log("started a first task");
+// CHECK FILE PATH!!!!
+readFile("./content/first.txt", "utf8", (err, result) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+  console.log(result);
+  console.log("completed first task");
+});
+console.log("starting next task");
+//OUTPUT
+[nodemon] starting `node app.js`
+started a first task
+starting next task
+This is the first file
+completed first task
+---------------------------------------------------------------------------------------------------
+ 
+SETTIMOUT
+// started operating system process
+console.log("first");
+setTimeout(() => {
+  console.log("second");
+}, 0);
+console.log("third");
+// completed and exited operating system process
+
+//OUTPUT
+first
+third
+second
+
+WHY B/S setTimout is asynchronous
+
+
+CommonJS -> nodejs uses commonjs and in nodejs every file is  module by default
+Modules -> encapsulated code (only share minimum)
+
+so define a variable or a fun in one file e.g. const x= "hello world" then
+use module.exports.x = x; to export it. so in every other file
+use the require to import the file (as object) and use every exported ppties.
+
+exports is an object, we can add any ppty to it
+
+exports.x = xx.....
+
+and access its ppty in other parts of the app.
+
+===============
+Ways of exporting variables or fn.
+
+1.
+module.exports.x=x;
+module.exports.y=anyOtherName;
+module.exports.items = [1,2,3];
+
+2. More elegant way
+module.exports = {x. y, ...}; 
+
+e.g.
+
+in one file
+var text = "hello fikremariam";
+function log() {
+  console.log("Biruk");
+}
+module.exports = { text };
+module.exports = { log };
+
+in other file
+const x = require("./4-first-module");
+x.log();
+const y = x.text;
+console.log(y);
+============================================
+what would happen to a fn  if you simply invoke a file w/o asigning it to a variable in another file.
+file1.js
+function log(){consol.log('hello');}
+
+file2.js
+require('./file1.js');
+
+run file2
+
+output
+hello
+
+hence the fn is invoked actually
+The surprizing thing is it would run, even though you can't asign it to another variable;
+
+//more elegant way is to use object destructuring than property names
+
+const {text, log} = require("./4-first-module");
+console.log(text);
+log();
+---------------
+Compare it with ES6 REVISION importing and exporting
+for single variable
+
+
+export var x
+// Export list
+export { name1, name2, …, nameN };
+// export features declared earlier
+export { square, cube };
+
+//while importing square function in test.js
+import { square, cube } from './math;
+
+Default Exports: Default exports are useful to export only a single object, function, variable. During the import, we can use any name to import. 
+// file module.js
+var x=4;
+export default x;
+ 
+// test.js
+// while importing x in test.js
+import y from './module';
+// note that y is used import x instead of
+// import x, because x was default export
+console.log(y);       
+// output will be 4
+
+//using both at the same time
+export { fun as default, x, y, square };
+
+END REVISION ES6
+-------------------------------
+
+
+Built in Modules, some that node provides are the following
+
+OS, PATH, FS, HTTP
+
+other bunch of modules exist just visit node.js/org/en   -> select version
+
+built in module doesn't need to be installed;
+
+OS
+---
+
+const os = require('os');
+
+=================================
+//current user
+console.log(os.userInfo());
+
+output
+$ node app.js
+{
+  uid: -1,
+  gid: -1,
+  username: 'fikremariamm',
+  homedir: 'C:\\Users\\User',
+  shell: null
+}
+
+//method returns the system Uptime in seconds
+console.log(os.uptime());
+
+//current operating system
+currentOs = {
+  name: os.type(),
+  release: os.release(),
+  freeMem: os.freemem(),
+  totalMem: os.totalmem(),
+};
+console.log(currentOs);
+//output
+{
+  name: 'Windows_NT',
+  release: '10.0.19044',
+  freeMem: 3927543808,
+  totalMem: 16805027840
+}
+=================================================
+JUST REVISION detecting os in asp.net core
+Using the RuntimeInformation class found in the System.Runtime.InteropServices namespace, we can check for a specific operating system:
+
+
+The various operating system platforms are described by the OSPlatform struct which defines three static properties:
+
+OSPlatform.Windows
+OSPlatform.OSX
+OSPlatform.Linux
+Using the RuntimeInformation class found in the System.Runtime.InteropServices namespace, we can check for a specific operating system:
+using System.Runtime.InteropServices;
+
+public static class OperatingSystem
+{
+    public static bool IsWindows() =>
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+    public static bool IsMacOS() =>
+        RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
+    public static bool IsLinux() =>
+        RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+}
+
+================================================
+PATH BUILTIN MODULE
+const path = require("path");
+
+//get platform specific path separator
+console.log(path.sep);
+OUTPUT
+\
+
+
+//JOIN file path's with platform specific separator
+//also helps to normalize by removing unnessary trailing slash
+
+const filePath = path.join(
+  "/content",
+  "folderName",
+  "subfolderName",
+  "file.js"
+);
+console.log(filePath);
+OUTPUT
+\content\folderName\subfolderName\file.js
+
+//get the base file name out of path
+const filePath = path.join(
+  "/content",
+  "folderName",
+  "subfolderName",
+  "file.js"
+);
+console.log(path.basename(filePath));
+OUTPUT
+file.js
+------------------------------------------------------------------------------------
+//change to absolute path
+we use __dirname which returns the absolute path of the current file
+const filePath = path.join(
+  "/content",
+  "folderName",
+  "subfolderName",
+  "file.js"
+);
+const absolutePath = path.resolve(__dirname, filePath);
+console.log(absolutePath);
+OUTPUT
+D:\content\folderName\subfolderName\file.js
+-------------------------------------------------------------------------------------
+CORE REVISION TO FIND TO RESOLVE INTO ABSOLUTE PATH
+public class HomeController : Controller {
+    private IWebHostEnvironment _hostEnvironment;
+
+    public HomeController(IWebHostEnvironment environment) {
+        _hostEnvironment = environment;
+    }
+
+    [HttpGet]
+    public IActionResult Get() {
+        string path = Path.Combine(_hostEnvironment.WebRootPath, "Sample.PNG");
+        return View();
+    }
+}
+------------------------------------------------------------------------------------------
+EN: Once we have this out of the way.,,
+
+------------------------------------------------------
+FS BUILTIN MODULE
+1. Reading Synchrounously
+const { readFileSync, writeFileSync, appendFileSync } = require("fs");
+//reading file
+var first = readFileSync("./fileDemo/first.txt", "utf8");
+console.log(first);
+var second = readFileSync("./fileDemo/second.txt", "utf8");
+console.log(second);
+//writing file a flag 'a' option will tell to append rather than writeover
+writeFileSync("./fileDemo/result.txt", `The result file ${first} : ${second}`, {
+  flag: "a",
+});
+2. Reading Asynchronously
+
+const { readFile, writeFile } = require("fs");
+readFile("./fileDemo/first.txt", "utf8", (err, result) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+  console.log(result);
+});
+
+writeFile("./fileDemo/result.txt", "what'sup", { flag: "a" }, (err, result) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+  console.log("done");//result is undefined if we log it here, we r expecting nothing
+});
+
+---------------------------------------------------------------------
+HTTP BUILTIN MODULE
+const http = require("http");
+const server = http.createServer((req, res) => {
+  if (req.url === "/") res.end("Welcome to home page");
+  if (req.url === "/about") res.end("This is our history");
+  //default response
+  res.end(`
+  <h1>Oops..</h1>
+  <p>requested page was not found. <a href="/">Navigate to home</a></p>`);
+});
+server.listen(5000);
+-----------------------------------------
+3 Ways to create packege.json
+ a) manually
+ b) using npm init and press enter to escape
+ c) using npm init -y (every thing is setup as default)
+
+Why package.json is needed?
+we can share our code w/o including the massive node_modules.
+-------------------------------------
+NODE MONITOR
+Any change in the app nodemon will watch and rerun our application
+npm i nodemon -D (inplace of -D you can us --save-dev
+
+why --save-dev b/s we use the dependency only while we create the app, e.g.testing packages,  nodemon, linting
+-----------------
+configuring option to run scripts for node and nodemon
+
+"scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+  },
+
+Gatsby - read as gazbi
+------------------------------------------------------------------------------------------------------------
+Why do we need to install globally?
+some front end libraries require to. e.g. Gatsby and create-react-app
+But with the arrival of npx we are now not required to do so.
+------------------------
+Version notes
+x.y.z
+x-major change
+y.minor change (backward compatable)
+z. patch or bug fix
+-------------------------------------------------------------------------------------------------------------
+http server: here the event loop control waits for the req objects and fire (execute the callback fn) the callback fn.
+const http = require('http')
+
+const server = http.createServer((req, res) => {
+  console.log('request event')
+  res.end('Hello World')
+})
+
+server.listen(5000, () => {
+  console.log('Server listening on port : 5000....')
+})
+
+--------------------------------------------------------------------------------------------------------------
+
+How to get result and go to another task from a callback function.
+How to avoid a chain of callback (after a callback end invoke another callback ...etc) to have a better neat code.
+
+1. wrap your callback fun in promise,
+const { readFile } = require("fs");
+
+const getText = (path) => {
+  return new Promise((resolve, rej) => {
+    readFile(path, "utf8", (err, result) => {
+      if (err) {
+        return rej(err);
+      }
+      return resolve(result);
+    });
+  });
+};
+
+2. Now call the function with await
+
+const readAndWriteFile = async () => {
+  try {
+    const text1 = await getText("./fileDemo/first.txt");
+    const text2 = await getText("./fileDemo/second.txt");
+    console.log(`text 1 is ${text1} and text 2 is ${text2}`);
+  } catch (err) {
+    console.log(err);
+  }
+};
+----------------------------------------------------------------------------------------------------------------
+
+The first part of the code is to promify the readFile method, we do have a util that make same function.
+
+const util = require("util");
+const readFilePromise = util.promisify(readFile);
+
+const readAndWriteFile = async () => {
+  try {
+    const text1 = await readFilePromise("./fileDemo/first.txt", "utf8");
+    const text2 = await readFilePromise("./fileDemo/second.txt", "utf8");
+    console.log(`text 1 is ${text1} and text 2 is ${text2}`);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+-----------------------------------------------------------------------------------------------------------
+
+=================================================================================================================
+Instead of util.promisify we can use promises method of the require object
+
+const { readFile } = require("fs").promises;
+
+const readAndWriteFile = async () => {
+  try {
+    const text1 = await readFile("./fileDemo/first.txt", "utf8");
+    const text2 = await readFile("./fileDemo/second.txt", "utf8");
+    console.log(`text 1 is ${text1} and text 2 is ${text2}`);
+  } catch (err) {
+    console.log(err);
+  }
+};
+readAndWriteFile();
+---------------------------------------------------------------------------------------------------------------
+EVENTS
+Event driven programming
+the flow of the program  is mainly determined by events. One events is coccur then we handle that event.
+---------------------------------------------------------------------------------------------------------------
+Event 
+
+const EventEmitter = require("events");
+const emitter = new EventEmitter();
+//creation and subscription
+emitter.on("accountChange", (arg1,arg2) => {
+  console.log(`Your account is changed to ${arg1}`);
+});
+
+//emit event
+emitter.emit("accountChange", arg1,arg2);
+Eventhough you might not setting up event, most of builting modules rely heavily on events
+----------------------------------------------------------------------------------------------------------
+STREAMS
+const { createReadStream, writeFile, writeFileSync } = require("fs");
+const stream = createReadStream("fileDemo/first.txt");
+
+stream.on("reading", (result) => {
+  console.log(result);
+});
+How can we send small chunks of data instead of one big file data on the wire?
+
+Example of sending chunked code
+
+const { createReadStream, writeFile, writeFileSync } = require("fs");
+const http = require("http");
+const server = http.createServer();
+server.on("request", (req, res) => {
+  const stream = createReadStream("fileDemo/first.txt");
+  stream.on("open", (r) => {
+    stream.pipe(res); //the pipe method do the chunking task
+  });
+  stream.on("error", (err) => {
+    res.end(err);
+  });
+});
+server.listen(5000, () => {
+  console.log("Server Listening to port 5000");
+});
+readAndWriteFile();
+---------------------------------------------------------------------------
+To prove the above send on chunked based, go to browser, inspect. Select Network, and click on localhost under Name column, in the Response Header, you will see
+this line ->  Transfer-Encoding: chunked
+So instead of sending the file on wire on one instance, use chunked ones.
+
+
+
+
+-----------------------------------------------------------------------------------------------
+EXPRESS
+http status code (source MDN WEB DOCS)
+100=199 => Inforational response
+200-299 => Successful Response
+300-399 => Redirects
+400-499 => Client errors
+500-599 => Server errors.
+
+Using node's http to serve page Example
+const http = require("http");
+const { readFileSync } = require("fs");
+const homePage = readFileSync("./2-express-tutorial/home.html");
+const aboutPage= readFileSync("./2-express-tutorial/about.html");
+const logo= readFileSync("./2-express-tutorial/logl.svg");
+
+const server = http.createServer((req, res) => {
+  //home page
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-type": "text/html" });
+    res.write(homePage);
+    res.end();
+  }
+  //about page
+  else if (req.url === "/about") {
+    res.writeHead(200, { "Content-type": "text/html" });
+    res.write("<h1>About page</h1>");
+    res.end();
+  }
+ // logo
+  else if (req.url === "/logo.vsg") {
+    res.writeHead(200, { "Content-type": "image/vsg" });
+    res.write(logo);
+    res.end();
+  }
+  //404
+  else {
+    res.writeHead(404, '{ "Content-type": "text/html"}');
+    res.write("<h1>Page was not found</h1>");
+    res.end();
+  }
+});
+server.listen(3000);
+--------------------------------------------------------------------------------------------------
+
+Note in the above evern we have to include all css and page referenced in the single html page.
+
+EXPRESS SERVER
+npm i express --save
+why --save b/s in previous versions of node if u do not include it, it will not be saved to the package.json. but now it is not required.
+
+Using express server intro
+const express = require("express");
+const app = express();
+
+app.get("/", (req, res) => {
+  res.status(200).send("Home Page");
+});
+app.get("/about", (req, res) => {
+  res.status(200).send("About Page");
+});
+app.all("*", (req, res) => {
+  res.status(404).send("Page not found");
+});
+app.listen(5000, () => {
+  console.log("server is listening to port 5000");
+});
+----------------------------------------------------------------------------------------
+More proper way of using express server-serving the static pages
+Put all the static pages in a folder called public.
+Setup a designated folder called public.
+
+then every refrence in the page will be automatically served when the page is requested.
+for this app.use which set up the middleware
+
+const express = require("express");
+const app = express();
+const path = require("path");
+app.use(express.static("./public"));
+
+app.get("/", (req, res) => {
+  res
+    .status(200)
+    .sendFile(path.resolve(__dirname, "2-express-tutorial/home.html"));
+});
+app.get("/about", (req, res) => {
+  res
+    .status(200)
+    .send(path.resolve(__dirname, "2-express-tutorial/about.html"));
+});
+app.get("*", (req, res) => {
+  res.status(404).send("<h1>Page was not found</h1>");
+});
+app.listen(5000, () => {
+  console.log("listening port 5000...");
+});
+
+Note if index.html was a static file too, you could have included in public folder and served automatically (with out manually configuring route in app.get).
+So when the user browse http://localhost/index.html, nodejs will serve it from public folder.
+========================================================================================
+
+Express Js 
+API                      VS               SSR(Server side rendering)
+API JSON				  SSR-Template
+SEND DATA                                 SEND-Template
+RES.JSON()                                RES.Render()
+
+
+=======================================================================================
+Express API
+json method it function similar to json.stringfy
+
+Example
+const {product} = require('./data');
+
+app.get("/data", (req, res) => {
+  res.json(product);
+});
+
+=====================================================================================================
+Handling the route parameters
+const express = require("express");
+const app = express();
+const { products } = require("./2-express-tutorial/data");
+
+app.get("/", (req, res) => {
+  res.status(200).send(
+      '<h1>Get List of Products</h1><p><a href="/products">Products</a></p>'
+    );
+});
+app.get("/products", (req, res) => {
+  const newProducts = products.map((product) => {
+    const { id, image, name } = product;
+    return { id, image, name };
+  });
+  res.status(200).json(newProducts);
+});
+app.get("/product/:productID", (req, res) => {
+  const { productID } = req.params;
+  const singleProduct = products.find(
+    (product) => product.id === Number(productID)
+  );
+  if (!product) return res.status(404).send("Product doesnot exist");
+  res.json(singleProduct);
+});
+app.listen(5000, () => {
+  console.log("Server is listening  on port 5000...");
+});
+======================================================================================================
+QUERY STRINGS, also called Url parameters
+
+All queries are saved in an object named req.query
+so destructuring:
+const {q1,q2,q3} = req.query;
+
+E.g.
+app.get("/api/v1/search", (req, res) => {
+ const {
+ 
+}
+=====================================================================================================
+javascript sort revision
+
+array.sort()  (returns descending order from z-to a, and numbers from 9 to 0)
+array.reverse() => in ascending order
+
+sorting array of numbers
+array.sort((a,b) => a-b));  returns sorted numbers in ascending order
+array.sort((a,b) => a-b));  returns sorted numbers in descending order
+===================================================================================================
+sorting array of objects
+const cars = [
+  {type:"Volvo", year:2016},
+  {type:"Saab", year:2001},
+  {type:"BMW", year:2010}
+];
+cars.sort(function(a, b){return a.year - b.year}); sorts by year in ascending order
+
+with string based
+cars.sort(function(a, b){
+  let x = a.type.toLowerCase();
+  let y = b.type.toLowerCase();
+  if (x < y) {return -1;}
+  if (x > y) {return 1;}
+  return 0;
+});
+==================================================================================================
+MIDDLEWARES => are functions that do a particular task b/n  a req and res
+E.g. Logger function
+
+const express = require("express");
+const app = express();
+const { products } = require("./2-express-tutorial/data");
+
+const logger = (req, res, next) => {
+  const data = {
+    url: req.url,
+    time: new Date().getFullYear(),
+    type: req.method,
+  };
+  console.log(data);
+  next();
+};
+app.get("/api/v1/product", logger, (req, res) => {
+  res.send("Product Page");
+});
+==============================================================
+using middleware for all routes in the app.
+Define fn in other file and import it. then pass it through 'use'
+
+app.use(logger);
+=========================================================
+Selectively adding middlewares to routes
+pass a string that is part of route where you want to apply the middleware
+
+app.use('/api/products', logger);
+Only routes that contain 'api/products' can pass throgh logger pipeline
+
+app.use mounts the specified middleware in the specified route.
+app.use(path, callback);
+
+Multiple middlewares
+
+app.use([[logger, authorize])
+
+or as parameter in express http verb functions
+app.post("/",[logger, authorize], (req, res) => {
+  res.status(200).send("Home Page");
+});
+
+-----------------------------------------------------------------------------
+simple authorize middleware
+authorize.js
+const authorize = (req, res, next) => {
+  const user = req.body.user;
+  if (!user || user.name !== "jhon") {
+    res.status(401).send("Unauthorize");
+    res.end();
+  } else {
+    req.user = { ...user, id: 1 };
+    next();
+  }
+};
+
+module.exports = authorize;
+--------------
+//app.js
+const express = require("express");
+const app = express();
+const authorize = require("./2-express-tutorial/authorize");
+app.use(express.json());
+app.post("/", authorize, (req, res) => {
+  res.status(200).send("Home Page");
+});
+
+app.listen(5000, () => {
+  console.log("Server is listening  on port 5000...");
+});
+----------------------------------------------------------------------------
+En. Just I think b/s the terminal is getting quite busy
+
+----------------------------------------------------------------------------
+POST Example
+const express = require("express");
+const app = express();
+app.use(express.json());
+const authorize = require("./2-express-tutorial/authorize");
+
+//app.use(express.urlencoded({ extended: true }));
+app.post("/", (req, res) => {
+  console.log(req.body);
+  const { name } = req.body.user;
+  if (name) {
+    res.status(200).send(`Welcome ${name}`);
+    return;
+  }
+  res.status(401).send("Error! You have not provided name.");
+});
+
+---------------------------------------------------------------------------
+Note in the above if header set to ‘content-type: application/x-www-form-urlencoded’ ,
+instead of express.json() use as follows
+ app.use(express.urlencoded({ extended: false }));
